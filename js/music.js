@@ -3,35 +3,16 @@ let currentSong = new Audio();
 let songs;
 let currFolder;
 
-let likedSongs = new Set();
 
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    const userIcon = document.getElementById("user-icon");
-    const dropdownMenu = document.getElementById("user-dropdown");
-    const logoutBtn = document.getElementById("logout-btn");
-
-    // Show dropdown on user icon click
-    userIcon.addEventListener("click", (event) => {
-        event.stopPropagation(); // Prevent immediate closing
-        dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+// Redirect buttons for Signup and Login
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector(".signupbtn").addEventListener("click", () => {
+        window.location.href = "signup.html";
     });
-
-    // Logout functionality
-    logoutBtn.addEventListener("click", () => {
-        alert("Logging out...");
-        window.location.href = "index.html"; // Redirect to index page
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener("click", (event) => {
-        if (!userIcon.contains(event.target) && !dropdownMenu.contains(event.target)) {
-            dropdownMenu.style.display = "none";
-        }
+    document.querySelector(".loginbtn").addEventListener("click", () => {
+        window.location.href = "login.html";
     });
 });
-
 
 
 function secondsToMinutesSeconds(seconds) {
@@ -83,11 +64,13 @@ async function getSongs(folder) {
                     <span>Play Now</span>
                     <img class="invert play-button" src="svg/play.svg" alt="" data-track="${song}">
                 </div>
-                <div class="download">
-                    <img class="invert download-button" src="svg/download.svg" alt="Download" data-track="${song}">
-                </div>
+               
             </li>`;
     }
+
+
+
+
 
     // Attach event listeners to play buttons
     document.querySelectorAll(".play-button").forEach(button => {
@@ -116,15 +99,6 @@ const playMusic = (track, pause = false) => {
     }
     document.querySelector(".songinfo").innerHTML = decodeURI(track);
     document.querySelector(".songtime").innerHTML = "00:00 / 00:00";
-
-    // ✅ Update like icon based on whether song is liked
-    const likeButton = document.getElementById("like-button");
-    if (likedSongs.has(track)) {
-        likeButton.src = "svg/heart-filled.svg";
-    } else {
-        likeButton.src = "svg/heart-regular.svg";
-    }
-    
 };
 
 // ✅ New function to handle downloads
@@ -192,10 +166,8 @@ currentSong.addEventListener("ended", () => {
 
 
 async function displayAlbums() {
-
-
     try {
-        let a = await fetch(`http://127.0.0.1:5500/songs/`);
+        let a = await fetch(`http://127.0.0.1:5501/songs/`);
         let response = await a.text();
         let div = document.createElement("div");
         div.innerHTML = response;
@@ -203,45 +175,35 @@ async function displayAlbums() {
         let cardContainer = document.querySelector(".cardContainer");
 
         let array = Array.from(anchors);
+        let displayCount = 0;
+
         for (let index = 0; index < array.length; index++) {
             const e = array[index];
-
-            // Extract folder name correctly
             let href = e.getAttribute("href");
 
-            // Skip invalid and empty links
-            if (!href || href === "../" || href === "/" || href === "songs/") {
+            if (!href || href === "../" || href === "/" || href === "songs/") continue;
 
-                continue;
-            }
+            let folder = href.replace(/^\/|\/$/g, "").trim();
+            folder = folder.replace("songs/", "");
 
-            // Extract only the folder name
-            let folder = href.replace(/^\/|\/$/g, "").trim(); // Remove leading & trailing slashes
-            folder = folder.replace("songs/", ""); // Prevent "songs/songs/" issue
-
-            // Skip empty or incorrect folder names
-            if (!folder || folder === "songs") {
-
-                continue;
-            }
+            if (!folder || folder === "songs") continue;
 
             try {
-                // Construct the correct URL for info.json
-                let jsonUrl = `http://127.0.0.1:5500/songs/${folder}/info.json`;
-
-                // Fetch metadata (info.json)
+                let jsonUrl = `http://127.0.0.1:5501/songs/${folder}/info.json`;
                 let metaResponse = await fetch(jsonUrl);
 
-                // Check if the request was successful
                 if (!metaResponse.ok) {
                     console.error(`Error fetching ${jsonUrl}:`, metaResponse.status, metaResponse.statusText);
                     continue;
                 }
 
-                let responseJson = await metaResponse.json(); // Parse JSON safely
+                let responseJson = await metaResponse.json();
+
+                // Set data-locked attribute for playlists beyond 3
+                const isLocked = displayCount >= 5;
 
                 cardContainer.innerHTML += `
-                    <div data-folder="${folder}" class="card">
+                    <div data-folder="${folder}" class="card" data-locked="${isLocked}">
                         <div class="play">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -253,24 +215,35 @@ async function displayAlbums() {
                         <h2>${responseJson.title}</h2>
                         <p>${responseJson.description}</p>
                     </div>`;
+
+                displayCount++;
             } catch (jsonError) {
                 console.error(`Failed to parse JSON for ${folder}:`, jsonError);
             }
         }
 
-        // Attach event listeners to album cards
+        // Attach click handlers to all cards
         Array.from(document.getElementsByClassName("card")).forEach(e => {
             e.addEventListener("click", async item => {
+                const card = item.currentTarget;
+                const folder = card.dataset.folder;
+                const isLocked = card.dataset.locked === "true";
 
-                songs = await getSongs(`songs/${item.currentTarget.dataset.folder}`);
+                if (isLocked) {
+                    alert("Please log in or sign up to access this playlist.");
+                    return;
+                }
+
+                songs = await getSongs(`songs/${folder}`);
                 playMusic(songs[0]);
             });
         });
-
     } catch (error) {
         console.error("Error fetching songs directory:", error);
     }
 }
+
+
 
 
 
@@ -364,11 +337,6 @@ async function main() {
         }
 
     })
-
-
-    
-       
-    
 
 
 
