@@ -1,0 +1,90 @@
+:root {
+    --primary-color: #f5d0c1;
+    /* Spotify green */
+    --secondary-color: #ee8a63;
+    --text-color: rgb(0, 0, 0);
+    --footer-color: rgba(0, 0, 0, 0.582);
+    --bg-color:  #f8a685; 
+    --pl--color: rgba(236, 162, 23, 0.979);
+    --pg-color: #ee8a63;
+
+}
+
+.border {
+    border: 2px;
+}
+
+.flex {
+    display: flex;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.bg-black {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+/* .invert {
+    filter: invert(1)
+} */
+
+.bg-grey {
+    background-color: var(--secondary-color);
+}
+
+.rounded {
+    border-radius: 7px;
+}
+
+.m-1 {
+    margin: 5px;
+}
+
+.p-1 {
+    padding: 10px;
+}
+
+/* Style the scrollbar */
+::-webkit-scrollbar {
+    width: 14px;
+    /* Width of the scrollbar */
+    height: 12px;
+    /* Height of the scrollbar (for horizontal scrollbars) */
+}
+
+/* Style the scrollbar track */
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    /* Dark background for the track */
+    border-radius: 6px;
+    /* Rounded corners */
+}
+
+/* Style the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+    background: var(--footer-color);
+    /* Dark gray thumb */
+    border-radius: 6px;
+    /* Rounded corners */
+    border: 3px solid var(--bg-color);
+    /* Adds padding and makes thumb stand out */
+}
+
+/* Hover effect for the scrollbar thumb */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--footer-color);
+    /* Lighter gray when hovered */
+}
+
+/* Active state for the scrollbar thumb */
+::-webkit-scrollbar-thumb:active {
+    background: var(--footer-color);
+    /* Even lighter gray when active */
+}
