@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="css/logsig.css">
+  <link rel="stylesheet" href="css/utility.css">
+</head>
+
+<body>
+
+  <div class="form-container">
+    <h2>Login</h2>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="username" placeholder="Enter your name" required autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="password" required>
+      </div>
+      <button type="submit" class="submit-btn">Login</button>
+    </form>
+    <p>Don't have an account? <a class="link" href="signup.html">SignUp</a></p>
+  </div>
+
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const username = document.getElementById("name").value;
+      const password = document.getElementById("password").value;
+
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Login successful!");
+        window.location.href = "new.html";
+      } else {
+        alert(data.message);
+      }
+    });
+
+  </script>
+
+
+</body>
+
+</html>
